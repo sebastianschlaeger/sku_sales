@@ -171,7 +171,7 @@ def add_inventory_data(summary_data, all_data):
         summary_data = pd.merge(summary_data, delivered, on='SKU', how='left')
         summary_data = pd.merge(summary_data, planned, on='SKU', how='left')
         
-        # Fill NaN values with 0
+        # Fill NaN values with 0 and convert to float
         for col in ['InitialQuantity', 'SupplierDelivery_Delivered', 'SupplierDelivery_Planned']:
             summary_data[col] = summary_data[col].fillna(0).astype(float)
         
@@ -229,7 +229,10 @@ def add_sku_names(summary_data):
 
 def add_platform_data(all_data, summary_data):
     """Fügt Plattformdaten zur Zusammenfassung hinzu."""
-    platform_data = all_data.groupby('SKU')['Platform'].apply(lambda x: ', '.join(sorted(set(x)))).reset_index()
+    def safe_join(x):
+        return ', '.join(sorted(set(str(item) for item in x if pd.notna(item))))
+    
+    platform_data = all_data.groupby('SKU')['Platform'].apply(safe_join).reset_index()
     return pd.merge(summary_data, platform_data, on='SKU', how='left')
 
 def sort_summary_data(summary_data):
