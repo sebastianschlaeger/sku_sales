@@ -21,12 +21,12 @@ def detail_analysis_tab():
         else:
             active_skus = []
 
-        analysis_results = {str(int(k)): v for k, v in analysis_results.items()}
+        analysis_results = {str(k): v for k, v in analysis_results.items()}
 
         sku_options = sorted([
-            (sku, f"{sku} - {SKU_NAMES.get(int(float(sku)), 'Unbekannt')}")
+            (sku, f"{sku} - {SKU_NAMES.get(sku, 'Unbekannt')}")
             for sku in active_skus if sku in analysis_results
-        ], key=lambda x: int(float(x[0])))
+        ], key=lambda x: x[0])
 
         sku_options.insert(0, ("all", "Alle Produkte"))
 
