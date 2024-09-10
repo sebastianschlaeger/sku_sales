@@ -173,7 +173,7 @@ def add_inventory_data(summary_data, all_data):
         
         # Fill NaN values with 0 and convert to float
         for col in ['InitialQuantity', 'SupplierDelivery_Delivered', 'SupplierDelivery_Planned']:
-            summary_data[col] = summary_data[col].fillna(0).astype(float)
+            summary_data[col] = summary_data[col].fillna(0).astype('float64')
         
         # Ensure Date column is datetime
         summary_data['Date'] = pd.to_datetime(summary_data['Date'])
@@ -233,6 +233,7 @@ def add_platform_data(all_data, summary_data):
         return ', '.join(sorted(set(str(item) for item in x if pd.notna(item))))
     
     platform_data = all_data.groupby('SKU')['Platform'].apply(safe_join).reset_index()
+    platform_data = platform_data.rename(columns={'Platform': 'Platforms'})
     return pd.merge(summary_data, platform_data, on='SKU', how='left')
 
 def sort_summary_data(summary_data):
