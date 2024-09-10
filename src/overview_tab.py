@@ -48,8 +48,8 @@ def overview_tab():
         
         for i, sku in enumerate(daily_sales.columns):
             with cols[i % 4]:
-                sku_str = str(int(float(sku)))
-                sku_name = SKU_NAMES.get(int(sku_str), f"Unbekannte SKU {sku_str}")
+                sku_str = str(sku)
+                sku_name = SKU_NAMES.get(sku_str, f"Unbekannte SKU {sku_str}")
                 sku_checkboxes[sku] = st.checkbox(f"{sku_str} - {sku_name}", value=False, key=f"checkbox_{sku_str}")
 
         # Erstelle den Chart
