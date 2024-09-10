@@ -95,8 +95,8 @@ def overview_tab():
 
     # Lade die Zusammenfassungsdaten
     summary_data = get_summary_data()
-    summary_data['SKU'] = summary_data['SKU'].apply(lambda x: str(int(x)))
-    
+    summary_data['SKU'] = summary_data['SKU'].astype(str)
+
     if not summary_data.empty:
         st.subheader("Zusammenfassung der Verkäufe")
         
