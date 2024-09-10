@@ -325,6 +325,11 @@ def update_data(date=None, overwrite_existing_data=False):
     
     while current_date >= last_import_date:
         orders_data = billbee_api.get_orders(current_date, current_date + timedelta(days=1))
+        
+        # Display the full API response of the first order
+        if days_processed == 0 and 'Data' in orders_data and len(orders_data['Data']) > 0:
+            st.json(orders_data['Data'][0])
+        
         processed_orders = process_orders(orders_data)
         save_to_s3(processed_orders, current_date, overwrite_existing_data)
         
