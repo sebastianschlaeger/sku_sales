@@ -173,7 +173,7 @@ def add_inventory_data(summary_data, all_data):
         
         # Fill NaN values with 0 and convert to float64
         for col in ['InitialQuantity', 'SupplierDelivery_Delivered', 'SupplierDelivery_Planned']:
-            summary_data[col] = summary_data[col].fillna(0).astype('float64')
+            summary_data[col] = summary_data[col].fillna(0).astype('float64').infer_objects(copy=False)
         
         # Ensure Date column is datetime
         summary_data['Date'] = pd.to_datetime(summary_data['Date'])
