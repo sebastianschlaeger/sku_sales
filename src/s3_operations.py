@@ -78,10 +78,10 @@ def get_all_data_since_date(start_date):
             return all_data[all_data['Date'] >= start_date]
         else:
             logger.warning("Keine Verkaufsdaten gefunden.")
-            return pd.DataFrame(columns=['Date', 'SKU', 'Quantity'])
+            return pd.DataFrame(columns=['Date', 'SKU', 'Quantity', 'Platform'])
     except Exception as e:
         logger.error(f"Fehler beim Laden der Daten aus S3: {str(e)}")
-        return pd.DataFrame(columns=['Date', 'SKU', 'Quantity'])
+        return pd.DataFrame(columns=['Date', 'SKU', 'Quantity', 'Platform'])
 
 def get_summary_data(days=30):
     """Erstellt eine Zusammenfassung der Verkaufsdaten."""
@@ -92,7 +92,7 @@ def get_summary_data(days=30):
         
         if all_data.empty:
             logger.warning("No data available")
-            return pd.DataFrame(columns=['SKU', 'SKU_Name', 'Last30DaysQuantity', 'AvgDailyQuantity', 'CurrentQuantity', 'PlannedDeliveries', 'InventoryDays', 'AdjustedInventoryDays', 'AdjustedInventoryDaysWithDeliveries', 'Trend'])
+            return pd.DataFrame(columns=['SKU', 'SKU_Name', 'Last30DaysQuantity', 'AvgDailyQuantity', 'CurrentQuantity', 'PlannedDeliveries', 'InventoryDays', 'AdjustedInventoryDays', 'AdjustedInventoryDaysWithDeliveries', 'Trend', 'Platforms'])
         
         all_data['Date'] = pd.to_datetime(all_data['Date'])
         
@@ -106,11 +106,12 @@ def get_summary_data(days=30):
         summary_data = add_trend_data(all_data, summary_data)
         summary_data = calculate_inventory_days(summary_data)
         summary_data = add_sku_names(summary_data)
+        summary_data = add_platform_data(all_data, summary_data)
         
         return sort_summary_data(summary_data)
     except Exception as e:
         logger.error(f"Error in get_summary_data: {str(e)}", exc_info=True)
-        return pd.DataFrame(columns=['SKU', 'SKU_Name', 'Last30DaysQuantity', 'AvgDailyQuantity', 'CurrentQuantity', 'PlannedDeliveries', 'InventoryDays', 'AdjustedInventoryDays', 'AdjustedInventoryDaysWithDeliveries', 'Trend'])
+        return pd.DataFrame(columns=['SKU', 'SKU_Name', 'Last30DaysQuantity', 'AvgDailyQuantity', 'CurrentQuantity', 'PlannedDeliveries', 'InventoryDays', 'AdjustedInventoryDays', 'AdjustedInventoryDaysWithDeliveries', 'Trend', 'Platforms'])
 
 
 def calculate_summary_data(all_data, start_date_30d):
@@ -225,10 +226,15 @@ def add_sku_names(summary_data):
     summary_data['SKU_Name'] = summary_data['SKU'].map(SKU_NAMES)
     return summary_data
 
+def add_platform_data(all_data, summary_data):
+    """Fügt Plattformdaten zur Zusammenfassung hinzu."""
+    platform_data = all_data.groupby('SKU')['Platform'].apply(lambda x: ', '.join(sorted(set(x)))).reset_index()
+    return pd.merge(summary_data, platform_data, on='SKU', how='left')
+
 def sort_summary_data(summary_data):
     """Sortiert die Zusammenfassungsdaten."""
     columns = ['SKU', 'SKU_Name', 'Last30DaysQuantity', 'AvgDailyQuantity', 'CurrentQuantity', 'PlannedDeliveries',
-               'InventoryDays', 'AdjustedInventoryDays', 'AdjustedInventoryDaysWithDeliveries', 'Trend']
+               'InventoryDays', 'AdjustedInventoryDays', 'AdjustedInventoryDaysWithDeliveries', 'Trend', 'Platforms']
     return summary_data[columns].sort_values('InventoryDays', ascending=True)
 
 def get_daily_sales_data(days=30):
