@@ -1,0 +1,10 @@
+streamlit
+pandas
+s3fs
+st-files-connection
+requests
+plotly
+scipy
+statsmodels
+scikit-learn
+numpy
