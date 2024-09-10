@@ -171,7 +171,7 @@ def add_inventory_data(summary_data, all_data):
         summary_data = pd.merge(summary_data, delivered, on='SKU', how='left')
         summary_data = pd.merge(summary_data, planned, on='SKU', how='left')
         
-        # Fill NaN values with 0 and convert to float64
+        # Fill NaN values with 0 and convert to float
         for col in ['InitialQuantity', 'SupplierDelivery_Delivered', 'SupplierDelivery_Planned']:
             summary_data[col] = summary_data[col].fillna(0).astype('float64')
         

@@ -11,21 +11,15 @@ def calculate_trend(data):
     data = data.sort_values('Date')
     data['Days'] = (data['Date'] - data['Date'].min()).dt.days
 
-    # Handle cases where there's not enough data or all x values are identical
-    if len(data) < 2 or data['Days'].nunique() == 1:
+    # Handle cases where there's not enough data
+    if len(data) < 2:
         return 0
 
-    try:
-        long_term_slope, _, _, _, _ = stats.linregress(data['Days'], data['Quantity'])
-    except ValueError:
-        long_term_slope = 0
+    long_term_slope, _, _, _, _ = stats.linregress(data['Days'], data['Quantity'])
 
     last_30_days = data[data['Date'] >= (data['Date'].max() - pd.Timedelta(days=30))]
-    if len(last_30_days) > 1 and last_30_days['Days'].nunique() > 1:
-        try:
-            short_term_slope, _, _, _, _ = stats.linregress(last_30_days['Days'], last_30_days['Quantity'])
-        except ValueError:
-            short_term_slope = 0
+    if len(last_30_days) > 1:
+        short_term_slope, _, _, _, _ = stats.linregress(last_30_days['Days'], last_30_days['Quantity'])
     else:
         short_term_slope = 0
 
@@ -75,7 +69,7 @@ def analyze_sku(sku_data):
     try:
         sku_data['Date'] = pd.to_datetime(sku_data['Date'])
         sku_data = sku_data.set_index('Date')
-        sku_data = sku_data.resample('D').sum().astype('float64').fillna(0)
+        sku_data = sku_data.resample('D').sum().fillna(0)
         
         if len(sku_data) >= 14:  # Ensure we have enough data for decomposition
             result = seasonal_decompose(sku_data['Quantity'], model='additive', period=7)
