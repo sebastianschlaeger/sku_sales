@@ -54,6 +54,7 @@ def load_existing_data(s3, full_path):
         data = pd.read_csv(f, parse_dates=['Date'])
     data['Quantity'] = data['Quantity'].astype(int)
     data['Date'] = data['Date'].dt.date  # Convert to datetime.date objects
+    data['Platform'] = data['Platform'].astype(str)  # Ensure Platform is loaded as string
     return data
 
 def date_exists(data, date):
