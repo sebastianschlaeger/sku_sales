@@ -11,15 +11,21 @@ def calculate_trend(data):
     data = data.sort_values('Date')
     data['Days'] = (data['Date'] - data['Date'].min()).dt.days
 
-    # Handle cases where there's not enough data
-    if len(data) < 2:
+    # Handle cases where there's not enough data or all x values are identical
+    if len(data) < 2 or data['Days'].nunique() == 1:
         return 0
 
-    long_term_slope, _, _, _, _ = stats.linregress(data['Days'], data['Quantity'])
+    try:
+        long_term_slope, _, _, _, _ = stats.linregress(data['Days'], data['Quantity'])
+    except ValueError:
+        long_term_slope = 0
 
     last_30_days = data[data['Date'] >= (data['Date'].max() - pd.Timedelta(days=30))]
-    if len(last_30_days) > 1:
-        short_term_slope, _, _, _, _ = stats.linregress(last_30_days['Days'], last_30_days['Quantity'])
+    if len(last_30_days) > 1 and last_30_days['Days'].nunique() > 1:
+        try:
+            short_term_slope, _, _, _, _ = stats.linregress(last_30_days['Days'], last_30_days['Quantity'])
+        except ValueError:
+            short_term_slope = 0
     else:
         short_term_slope = 0
 
