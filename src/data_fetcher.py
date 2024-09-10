@@ -17,5 +17,6 @@ def fetch_and_save_missing_data(overwrite_data):
             progress = (i + 1) / total_dates
             progress_bar.progress(progress)
         st.success(f"Data fetched and saved successfully for {total_dates} dates!")
+        st.rerun()  # Add this line to rerun the app
     else:
         st.info("No missing data to fetch.")
