@@ -20,11 +20,11 @@ def winners_tab():
     # Create a line chart
     fig = px.line(
         top_20,
-        x='SKU',
+        x='SKU_Name',
         y='Last30DaysQuantity',
         title='Top 20 Produkte nach Verkaufsmenge (letzte 30 Tage)',
-        labels={'Last30DaysQuantity': 'Verkaufsmenge', 'SKU': 'SKU'},
-        hover_data=['SKU_Name', 'AvgDailyQuantity', 'CurrentQuantity']
+        labels={'Last30DaysQuantity': 'Verkaufsmenge', 'SKU_Name': 'Produkt'},
+        hover_data=['SKU', 'AvgDailyQuantity', 'CurrentQuantity']
     )
     fig.update_xaxes(tickangle=45)
     fig.update_traces(mode='lines+markers')
