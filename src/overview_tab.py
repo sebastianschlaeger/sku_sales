@@ -36,21 +36,17 @@ def overview_tab():
         # Entferne den aktuellen Tag
         daily_sales = daily_sales[daily_sales.index < pd.Timestamp.now().floor('D')]
 
-        # Erstelle Checkboxen für jede SKU und eine für die Summe
-        st.write("SKUs auswählen:")
-        
-        # Checkbox für die Summe aller SKUs
-        show_sum = st.checkbox("Summe aller SKUs", value=True)
-        
-        # Erstelle Spalten für die SKU-Checkboxen
-        cols = st.columns(4)  # Anpassen Sie die Anzahl der Spalten nach Bedarf
-        sku_checkboxes = {}
-        
-        for i, sku in enumerate(daily_sales.columns):
-            with cols[i % 4]:
-                sku_str = str(sku)
-                sku_name = SKU_NAMES.get(sku_str, f"Unbekannte SKU {sku_str}")
-                sku_checkboxes[sku] = st.checkbox(f"{sku_str} - {sku_name}", value=False, key=f"checkbox_{sku_str}")
+        # Dropdown for SKU selection
+        available_skus = daily_sales.columns.tolist()
+        selected_skus = st.multiselect(
+            "SKUs auswählen:",
+            options=available_skus,
+            default=available_skus[:5],
+            format_func=lambda x: f"{x} - {SKU_NAMES.get(str(int(x)), 'Unbekannt')}"
+        )
+
+        # Create a dictionary to store the selection state for each SKU
+        sku_selection = {sku: sku in selected_skus for sku in available_skus}
 
         # Erstelle den Chart
         fig = go.Figure()
@@ -69,7 +65,7 @@ def overview_tab():
 
         # Füge individuelle SKU-Linien hinzu
         for sku in daily_sales.columns:
-            if sku_checkboxes[sku]:
+            if sku_selection[sku]:
                 sku_str = str(int(sku))
                 sku_name = SKU_NAMES.get(sku_str, f"Unbekannte SKU {sku_str}")
                 fig.add_trace(go.Scatter(
