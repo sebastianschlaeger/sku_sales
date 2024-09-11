@@ -42,7 +42,7 @@ def overview_tab():
             "SKUs auswählen:",
             options=available_skus,
             default=available_skus[:5],
-            format_func=lambda x: f"{x} - {SKU_NAMES.get(str(int(x)), 'Unbekannt')}"
+            format_func=lambda x: f"{x} - {SKU_NAMES.get(x, 'Unbekannt')}"
         )
 
         # Create a dictionary to store the selection state for each SKU
@@ -65,14 +65,13 @@ def overview_tab():
 
         # Füge individuelle SKU-Linien hinzu
         for sku in daily_sales.columns:
-            if sku_selection[sku]:
-                sku_str = str(int(sku))
-                sku_name = SKU_NAMES.get(sku_str, f"Unbekannte SKU {sku_str}")
+            if sku in selected_skus:
+                sku_name = SKU_NAMES.get(sku, f"Unbekannte SKU {sku}")
                 fig.add_trace(go.Scatter(
                     x=daily_sales.index.strftime('%Y-%m-%d'),
                     y=daily_sales[sku],
                     mode='lines+markers',
-                    name=f'{sku_str} - {sku_name}',
+                    name=f'{sku} - {sku_name}',
                     hovertemplate='Datum: %{x}<br>Verkäufe: %{y}<extra></extra>'
                 ))
 
