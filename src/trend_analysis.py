@@ -76,7 +76,9 @@ def analyze_sku(sku_data):
     try:
         sku_data['Date'] = pd.to_datetime(sku_data['Date'])
         sku_data = sku_data.set_index('Date')
-        sku_data = sku_data.resample('D').sum().fillna(0)
+        sku_data = sku_data.resample('D').sum()
+        sku_data = sku_data.fillna(0)
+        sku_data = sku_data.infer_objects(copy=False)
         
         if len(sku_data) >= 14:  # Ensure we have enough data for decomposition
             result = seasonal_decompose(sku_data['Quantity'], model='additive', period=7)
