@@ -20,11 +20,16 @@ def winners_tab():
     # Get daily sales data for the last 30 days
     daily_sales = get_daily_sales_data(days=30)
 
+    # Ensure 'SKU' column exists in daily_sales
+    if 'SKU' not in daily_sales.columns:
+        st.warning("SKU column not found in daily sales data.")
+        return
+
     # Filter daily sales data for top 20 SKUs
     top_20_daily = daily_sales[daily_sales['SKU'].isin(top_20['SKU'])]
 
     # Melt the dataframe to create a format suitable for line plot
-    melted_data = top_20_daily.melt(id_vars=['Date', 'SKU'], var_name='Metric', value_name='Quantity')
+    melted_data = top_20_daily.melt(id_vars=['Date', 'SKU'], value_vars=['Quantity'], var_name='Metric', value_name='Quantity')
 
     # Add SKU names
     melted_data['SKU_Name'] = melted_data['SKU'].map(SKU_NAMES)
