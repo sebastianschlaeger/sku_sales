@@ -83,6 +83,9 @@ def analyze_sku(sku_data):
         # Clean the SKU column
         sku_data['SKU'] = sku_data['SKU'].astype(str).str.split('-').str[0]
         
+        # Remove the 'Platform' column from the analysis
+        sku_data = sku_data.drop(columns=['Platform'], errors='ignore')
+        
         sku_data = sku_data.resample('D').sum().astype('float64')
         
         if len(sku_data) >= 14:  # Ensure we have enough data for decomposition
