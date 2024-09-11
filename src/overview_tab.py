@@ -48,6 +48,9 @@ def overview_tab():
         # Create a dictionary to store the selection state for each SKU
         sku_selection = {sku: sku in selected_skus for sku in available_skus}
 
+        # Checkbox for showing the sum of all SKUs
+        show_sum = st.checkbox("Summe aller SKUs anzeigen", value=True)
+
         # Erstelle den Chart
         fig = go.Figure()
 
