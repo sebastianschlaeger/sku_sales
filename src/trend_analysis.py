@@ -39,6 +39,7 @@ def calculate_seasonality(data):
     
     date_range = pd.date_range(start=data.index.min(), end=data.index.max(), freq='D')
     data = data.reindex(date_range).fillna(0)
+    data = data.infer_objects(copy=False)
     
     if len(data) >= 14:
         result = seasonal_decompose(data['Quantity'], model='additive', period=7)
