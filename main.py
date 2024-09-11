@@ -7,6 +7,9 @@ from src.winners_tab import winners_tab
 from src.trending_tab import trending_tab
 from src.losing_tab import losing_tab
 
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 st.set_page_config(layout="wide")
 st.title("Procurement App - Original SKU Analysis")
 
