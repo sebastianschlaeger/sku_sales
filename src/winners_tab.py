@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from src.s3_operations import get_summary_data
+from src.s3_operations import get_summary_data, get_daily_sales_data
 from src.sku_names import SKU_NAMES
 
 def winners_tab():
@@ -17,17 +17,30 @@ def winners_tab():
     # Sort by Last30DaysQuantity and get top 20
     top_20 = summary_data.nlargest(20, 'Last30DaysQuantity')
 
+    # Get daily sales data for the last 30 days
+    daily_sales = get_daily_sales_data(days=30)
+
+    # Filter daily sales data for top 20 SKUs
+    top_20_daily = daily_sales[top_20['SKU']]
+
+    # Melt the dataframe to create a format suitable for line plot
+    melted_data = top_20_daily.reset_index().melt(id_vars='Date', var_name='SKU', value_name='Quantity')
+
+    # Add SKU names
+    melted_data['SKU_Name'] = melted_data['SKU'].map(SKU_NAMES)
+
     # Create a line chart
     fig = px.line(
-        top_20,
-        x='SKU_Name',
-        y='Last30DaysQuantity',
+        melted_data,
+        x='Date',
+        y='Quantity',
+        color='SKU_Name',
         title='Top 20 Produkte nach Verkaufsmenge (letzte 30 Tage)',
-        labels={'Last30DaysQuantity': 'Verkaufsmenge', 'SKU_Name': 'Produkt'},
-        hover_data=['SKU', 'AvgDailyQuantity', 'CurrentQuantity']
+        labels={'Quantity': 'Verkaufsmenge', 'Date': 'Datum'},
+        hover_data=['SKU']
     )
-    fig.update_xaxes(tickangle=45)
-    fig.update_traces(mode='lines+markers')
+    fig.update_xaxes(title='Datum')
+    fig.update_yaxes(title='Verkaufsmenge')
     st.plotly_chart(fig, use_container_width=True)
 
     # Display data table
