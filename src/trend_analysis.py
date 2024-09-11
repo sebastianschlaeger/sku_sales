@@ -10,6 +10,9 @@ logger = logging.getLogger(__name__)
 def calculate_trend(data):
     data = data.sort_values('Date')
     data['Days'] = (data['Date'] - data['Date'].min()).dt.days
+    
+    # Clean the SKU column
+    data['SKU'] = data['SKU'].astype(str).str.split('-').str[0]
 
     # Handle cases where there's not enough data or all x values are identical
     if len(data) < 2 or data['Days'].nunique() == 1:
@@ -76,6 +79,10 @@ def analyze_sku(sku_data):
     try:
         sku_data['Date'] = pd.to_datetime(sku_data['Date'])
         sku_data = sku_data.set_index('Date')
+        
+        # Clean the SKU column
+        sku_data['SKU'] = sku_data['SKU'].astype(str).str.split('-').str[0]
+        
         sku_data = sku_data.resample('D').sum().astype('float64')
         
         if len(sku_data) >= 14:  # Ensure we have enough data for decomposition
