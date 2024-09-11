@@ -1,9 +1,5 @@
 import pandas as pd
 from datetime import datetime
-from src.sku_mappings import apply_sku_mapping
-
-def process_sku(sku):
-    return str(sku).split('-')[0]  # Remove everything after the hyphen
 
 def process_orders(orders_data):
     orders = orders_data.get('Data', [])
