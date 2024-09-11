@@ -21,10 +21,10 @@ def winners_tab():
     daily_sales = get_daily_sales_data(days=30)
 
     # Filter daily sales data for top 20 SKUs
-    top_20_daily = daily_sales[top_20['SKU']]
+    top_20_daily = daily_sales[top_20['SKU']].reset_index()
 
     # Melt the dataframe to create a format suitable for line plot
-    melted_data = top_20_daily.reset_index().melt(id_vars='Date', var_name='SKU', value_name='Quantity')
+    melted_data = top_20_daily.melt(id_vars='Date', var_name='SKU', value_name='Quantity')
 
     # Add SKU names
     melted_data['SKU_Name'] = melted_data['SKU'].map(SKU_NAMES)
